@@ -30,3 +30,4 @@ gradlew.bat
 gradlew
 gradle
 build
+resources\vkapi.properties
