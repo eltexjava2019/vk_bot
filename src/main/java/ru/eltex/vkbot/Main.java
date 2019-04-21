@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 import ru.eltex.vkbot.model.Post;
 import ru.eltex.vkbot.vkapi.VkApi;
 
-import java.io.IOException;
+import java.io.*;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -18,9 +18,11 @@ public class Main {
             try {
                 while (true) {
                     List<Post> posts = VkApi.getAllPosts();
-                    //TODO обработка постов
+                    for (Post post: posts) {
+                        post.filter();
+                    }
                     Thread.sleep(TimeUnit.MINUTES.toMillis(1));
-                }
+                }   
             } catch (IOException e) {
                 LOGGER.error("IOException: {}", e.getMessage());
             } catch (InterruptedException e) {

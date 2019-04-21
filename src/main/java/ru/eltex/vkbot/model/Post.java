@@ -1,6 +1,8 @@
 package ru.eltex.vkbot.model;
 
+import java.io.InputStream;
 import java.util.List;
+import java.util.Scanner;
 
 public class Post {
 
@@ -27,6 +29,52 @@ public class Post {
         this.comments = comments;
         this.likes = likes;
         this.reposts = reposts;
+    }
+
+    private void deleteThisPost() {
+        System.out.println("delete post with text:\n" + text);
+        //TODO
+    }
+
+    public void filter() {
+        String[] strings = readFromDictionary();
+        int sizeStrings = strings.length;
+        for(int i = 0; i < strings.length; i++) {
+            if (strings[i] == null) {
+                sizeStrings = i;
+                break;
+            }
+        }
+        for(int i = 0; i < sizeStrings; i++) {
+            if (text.contains(strings[i])) {
+                deleteThisPost();
+                break;
+            }
+        }
+    }
+
+    private String[] readFromDictionary() {
+        final int MAX_COUNT_WORD_IN_DICTIONARY = 5000;
+        String[] strings = new String[MAX_COUNT_WORD_IN_DICTIONARY];
+        int i = 0;
+        InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("dictionary");
+        try {
+            Scanner scanner = new Scanner(inputStream);
+            while(scanner.hasNext()) {
+                strings[i] = scanner.next();
+                i++;
+                if (i == MAX_COUNT_WORD_IN_DICTIONARY - 1) {
+                    //TODO: logger: big dictionary
+                    break;
+                }
+            }
+        } catch (NullPointerException ex) {
+            //TODO: logger: dictionary not found
+        }
+        if (i == 0) {
+            //TODO: logger: dictionary empty
+        }
+        return strings;
     }
 
     public int getId() {
