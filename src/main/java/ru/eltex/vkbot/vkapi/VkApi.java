@@ -1,7 +1,5 @@
 package ru.eltex.vkbot.vkapi;
 
-import com.google.gson.Gson;
-import ru.eltex.vkbot.model.JSON;
 import ru.eltex.vkbot.model.Post;
 
 import java.io.BufferedReader;
@@ -19,8 +17,6 @@ public class VkApi {
 
     private static final String BASE_API_ADDRESS = "https://api.vk.com/method/";
 
-    private static final Gson gson = new Gson();
-
     private VkApi() {
 
     }
@@ -37,9 +33,7 @@ public class VkApi {
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
         String response = bufferedReader.lines().collect(Collectors.joining(System.lineSeparator()));
         bufferedReader.close();
-
-        JSON json = gson.fromJson(response, JSON.class);
-        return json.getResponse().getPosts();
+        return JsonParser.getPostsFromJson(response);
     }
 
     private static String createRequestUrl(String methodName, List<String> params) {
