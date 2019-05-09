@@ -11,6 +11,8 @@ public class Post implements Serializable {
     @Id
     @GeneratedValue
     private int id;
+
+    private int postId;
     private String text;
 
     @Column(name = "user_id")
@@ -20,26 +22,36 @@ public class Post implements Serializable {
     @Transient
     private transient boolean removePost;
 
-    public Post() {
-
+    public int getPostId() {
+        return postId;
     }
 
-    public Post(String text, int userId, int date) {
-        this.text = text;
-        this.userId = userId;
-        this.date = date;
+    public void setPostId(int postId) {
+        this.postId = postId;
     }
 
     public String getText() {
         return text;
     }
 
+    public void setText(String text) {
+        this.text = text;
+    }
+
     public int getUserId() {
         return userId;
     }
 
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
+
     public int getDate() {
         return date;
+    }
+
+    public void setDate(int date) {
+        this.date = date;
     }
 
     public boolean isRemovePost() {

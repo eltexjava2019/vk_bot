@@ -36,14 +36,14 @@ class VkObjectFilter {
         if (dictionary == null) {
             readDictionaryFromFile();
         }
-        posts.stream()
-                .filter(post -> {
-                    for (String word : dictionary) {
-                        if (post.getText().contains(word)) {
-                            return false;
-                        }
-                    }
-                    return true;
-                }).forEach(post -> post.setRemovePost(true));
+        for (Post post : posts) {
+            for (String word: dictionary) {
+                if (post.getText().contains(word)) {
+                    post.setRemovePost(true);
+                    break;
+                }
+            }
+        }
+
     }
 }

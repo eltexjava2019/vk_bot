@@ -36,6 +36,21 @@ public class VkApi {
         return JsonParser.getPostsFromJson(response);
     }
 
+    public static void removePostOnWall(Post post) throws IOException {
+        String requestUrl = createRequestUrl("wall.delete", Arrays.asList("v=5.95",
+                "owner_id=" + getProperty("group_id"),
+                "post_id=" + post.getPostId(),
+                "access_token=" + getProperty("bot_service_key")));
+
+        URL url = new URL(requestUrl);
+        HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+        httpURLConnection.setRequestMethod("GET");
+
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
+        String response = bufferedReader.lines().collect(Collectors.joining(System.lineSeparator()));
+        bufferedReader.close();
+    }
+
     private static String createRequestUrl(String methodName, List<String> params) {
         if (params.isEmpty()) {
             return BASE_API_ADDRESS + methodName;

@@ -22,10 +22,17 @@ class JsonParser {
         List<Post> posts = new ArrayList<>(jsonArray.size());
         for (JsonElement jsonElement : jsonArray) {
             JsonObject object = jsonElement.getAsJsonObject();
+            int postId = object.get("id").getAsInt();
             String text = object.get("text").getAsString();
             int userId = object.get("from_id").getAsInt();
             int date = object.get("date").getAsInt();
-            posts.add(new Post(text, userId, date));
+
+            Post post = new Post();
+            post.setPostId(postId);
+            post.setText(text);
+            post.setUserId(userId);
+            post.setDate(date);
+            posts.add(post);
         }
         return posts;
     }

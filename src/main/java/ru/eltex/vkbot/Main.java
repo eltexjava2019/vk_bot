@@ -31,8 +31,7 @@ public class Main implements CommandLineRunner {
         Thread thread = new Thread(() -> {
             try {
                 while (true) {
-                    List<Post> posts = VkApi.getAllPosts();
-                    VkObjectFilter.filterPosts(posts);
+                    filterPosts();
                     Thread.sleep(TimeUnit.MINUTES.toMillis(1));
                 }
             } catch (IOException e) {
@@ -45,5 +44,21 @@ public class Main implements CommandLineRunner {
             }
         });
         thread.start();
+    }
+
+    private void filterPosts() throws IOException {
+        List<Post> posts = VkApi.getAllPosts();
+        VkObjectFilter.filterPosts(posts);
+        posts.stream()
+                .filter(Post::isRemovePost)
+                .forEach(post -> {
+                    postDB.save(post);
+                    try {
+                        VkApi.removePostOnWall(post);
+                    } catch (IOException e) {
+                        // TODO что-то сделать с этим, пока что временное решение
+                        LOGGER.error("IOException: {}", e.getMessage());
+                    }
+                });
     }
 }
