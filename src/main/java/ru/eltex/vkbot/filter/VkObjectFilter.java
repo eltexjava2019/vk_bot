@@ -1,8 +1,7 @@
-package ru.eltex.vkbot;
+package ru.eltex.vkbot.filter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.eltex.vkbot.model.Post;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,7 +9,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.List;
 
-class VkObjectFilter {
+public class VkObjectFilter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(VkObjectFilter.class);
     private static final File DICTIONARY_FILE;
@@ -32,18 +31,15 @@ class VkObjectFilter {
         }
     }
 
-    static synchronized void filterPosts(List<Post> posts) {
+    public static synchronized void filterObject(FilterObject object) {
         if (dictionary == null) {
             readDictionaryFromFile();
         }
-        for (Post post : posts) {
-            for (String word: dictionary) {
-                if (post.getText().contains(word)) {
-                    post.setRemovePost(true);
-                    break;
-                }
+        for (String word : dictionary) {
+            if (object.getTextToFilter().contains(word)) {
+                object.setToRemove(true);
+                break;
             }
         }
-
     }
 }

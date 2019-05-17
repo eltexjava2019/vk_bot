@@ -1,5 +1,6 @@
 package ru.eltex.vkbot.vkapi;
 
+import ru.eltex.vkbot.model.Comment;
 import ru.eltex.vkbot.model.Post;
 
 import java.io.BufferedReader;
@@ -40,7 +41,39 @@ public class VkApi {
         String requestUrl = createRequestUrl("wall.delete", Arrays.asList("v=5.95",
                 "owner_id=" + getProperty("group_id"),
                 "post_id=" + post.getPostId(),
+                "access_token=" + getProperty("user_access_token")));
+
+        URL url = new URL(requestUrl);
+        HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+        httpURLConnection.setRequestMethod("GET");
+
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
+        String response = bufferedReader.lines().collect(Collectors.joining(System.lineSeparator()));
+        bufferedReader.close();
+    }
+
+    public static List<Comment> getCommentsFromPost(Post post) throws IOException {
+        String requestUrl = createRequestUrl("wall.getComments", Arrays.asList("v=5.95",
+                "owner_id=" + getProperty("group_id"),
+                "post_id=" + post.getPostId(),
                 "access_token=" + getProperty("bot_service_key")));
+
+        URL url = new URL(requestUrl);
+        HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+        httpURLConnection.setRequestMethod("GET");
+
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
+        String response = bufferedReader.lines().collect(Collectors.joining(System.lineSeparator()));
+        bufferedReader.close();
+
+        return JsonParser.getCommentsFromJson(response);
+    }
+
+    public static void removeCommentOnPost(Comment comment) throws IOException {
+        String requestUrl = createRequestUrl("wall.deleteComment", Arrays.asList("v=5.95",
+                "owner_id=" + getProperty("group_id"),
+                "comment_id=" + comment.getCommentId(),
+                "access_token=" + getProperty("user_access_token")));
 
         URL url = new URL(requestUrl);
         HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();

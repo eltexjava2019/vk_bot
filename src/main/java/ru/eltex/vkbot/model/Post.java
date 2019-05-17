@@ -1,12 +1,14 @@
 package ru.eltex.vkbot.model;
 
-import javax.persistence.*;
-import java.io.Serializable;
+import ru.eltex.vkbot.filter.FilterObject;
 
+import javax.persistence.*;
+
+@SuppressWarnings("unused")
 @Entity
 @Table(name = "posts")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-public class Post implements Serializable {
+public class Post implements FilterObject {
 
     @Id
     @GeneratedValue
@@ -21,6 +23,16 @@ public class Post implements Serializable {
 
     @Transient
     private transient boolean removePost;
+
+    @Override
+    public void setToRemove(boolean value) {
+        removePost = value;
+    }
+
+    @Override
+    public String getTextToFilter() {
+        return text;
+    }
 
     public int getPostId() {
         return postId;

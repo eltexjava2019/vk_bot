@@ -7,10 +7,13 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import ru.eltex.vkbot.database.PostRepository;
+import ru.eltex.vkbot.filter.VkObjectFilter;
+import ru.eltex.vkbot.model.Comment;
 import ru.eltex.vkbot.model.Post;
 import ru.eltex.vkbot.vkapi.VkApi;
 
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -31,7 +34,9 @@ public class Main implements CommandLineRunner {
         Thread thread = new Thread(() -> {
             try {
                 while (true) {
-                    filterPosts();
+                    List<Post> posts = VkApi.getAllPosts();
+                    filterPosts(posts);
+                    filterComments(posts);
                     Thread.sleep(TimeUnit.MINUTES.toMillis(1));
                 }
             } catch (IOException e) {
@@ -46,19 +51,33 @@ public class Main implements CommandLineRunner {
         thread.start();
     }
 
-    private void filterPosts() throws IOException {
-        List<Post> posts = VkApi.getAllPosts();
-        VkObjectFilter.filterPosts(posts);
-        posts.stream()
-                .filter(Post::isRemovePost)
-                .forEach(post -> {
-                    postDB.save(post);
-                    try {
-                        VkApi.removePostOnWall(post);
-                    } catch (IOException e) {
-                        // TODO что-то сделать с этим, пока что временное решение
-                        LOGGER.error("IOException: {}", e.getMessage());
-                    }
-                });
+    private void filterPosts(List<Post> posts) throws IOException {
+        Iterator<Post> postIterator = posts.iterator();
+        while (postIterator.hasNext()) {
+            Post post = postIterator.next();
+            VkObjectFilter.filterObject(post);
+            if (post.isRemovePost()) {
+                postDB.save(post);
+                VkApi.removePostOnWall(post);
+                postIterator.remove();
+            }
+        }
+    }
+
+    private void filterComments(List<Post> posts) throws IOException {
+        for (Post post : posts) {
+            List<Comment> comments = VkApi.getCommentsFromPost(post);
+            Iterator<Comment> commentIterator = comments.iterator();
+            while (commentIterator.hasNext()) {
+                Comment comment = commentIterator.next();
+                VkObjectFilter.filterObject(comment);
+                if (comment.isRemoveComment()) {
+                    // TODO save post to database
+                    VkApi.removeCommentOnPost(comment);
+                    commentIterator.remove();
+                }
+            }
+        }
+
     }
 }
