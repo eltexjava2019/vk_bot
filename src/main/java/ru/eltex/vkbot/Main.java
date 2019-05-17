@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import ru.eltex.vkbot.database.CommentRepository;
 import ru.eltex.vkbot.database.PostRepository;
 import ru.eltex.vkbot.filter.VkObjectFilter;
 import ru.eltex.vkbot.model.Comment;
@@ -24,6 +25,8 @@ public class Main implements CommandLineRunner {
 
     @Autowired
     private PostRepository postDB;
+    @Autowired
+    private CommentRepository commentDB;
 
     public static void main(String[] args) {
         SpringApplication.run(Main.class, args);
@@ -72,7 +75,7 @@ public class Main implements CommandLineRunner {
                 Comment comment = commentIterator.next();
                 VkObjectFilter.filterObject(comment);
                 if (comment.isRemoveComment()) {
-                    // TODO save post to database
+                    commentDB.save(comment);
                     VkApi.removeCommentOnPost(comment);
                     commentIterator.remove();
                 }

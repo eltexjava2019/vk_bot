@@ -2,15 +2,24 @@ package ru.eltex.vkbot.model;
 
 import ru.eltex.vkbot.filter.FilterObject;
 
+import javax.persistence.*;
+
 @SuppressWarnings("unused")
+@Entity
+@Table(name="comments")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public class Comment implements FilterObject {
 
+    @Id
+    @GeneratedValue
     private int id;
     private int userId;
     private int postId;
     private int commentId;
     private int date;
     private String text;
+
+    @Transient
     private transient boolean removeComment;
 
     @Override
